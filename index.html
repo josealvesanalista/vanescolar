@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Van Pro V19</title>
+    <style>
+        :root { --primary: #f39c12; --secondary: #2c3e50; --bg: #f4f7f6; --success: #27ae60; --danger: #e74c3c; --blue: #3498db; --whatsapp: #25d366; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: #333; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        header { background: var(--secondary); color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .menu-icon { font-size: 24px; cursor: pointer; padding: 5px; }
+        .sidebar { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: var(--secondary); color: white; transition: 0.3s; z-index: 2000; padding-top: 60px; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
+        .sidebar.active { left: 0; }
+        .sidebar a { display: block; padding: 15px 25px; color: #ecf0f1; text-decoration: none; border-bottom: 1px solid #34495e; font-size: 16px; cursor: pointer; }
+        .sidebar a:active { background: var(--primary); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1500; }
+        .overlay.active { display: block; }
+        .container { padding: 20px; max-width: 600px; margin: auto; }
+        .view { display: none; animation: fadeIn 0.3s; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .home-hero { text-align: center; padding: 40px 20px; }
+        .van-logo { font-size: 80px; margin-bottom: 10px; display: block; }
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        .home-btn { background: white; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #ddd; text-decoration: none; color: var(--secondary); font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
+        .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; }
+        label { font-size: 12px; font-weight: bold; color: #7f8c8d; }
+        input, select { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .item-aluno { display: flex; align-items: center; background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-left: 8px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .info { flex: 1; cursor: pointer; }
+        .btn-seta { background: #f8f9fa; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; margin: 2px; font-weight: bold; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .fechar-modal { position: absolute; right: 20px; top: 15px; font-size: 28px; color: #95a5a6; cursor: pointer; }
+        .btn-modal { display: block; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-align: center; text-decoration: none; border: none; font-size: 14px; box-sizing: border-box; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <a onclick="navegar('v-home')">🏠 Início</a>
+        <a onclick="navegar('v-rota')">🚐 Ver Rota Diária</a>
+        <a onclick="navegar('v-aluno')">👤 Cadastrar Aluno</a>
+        <a onclick="navegar('v-escola')">🏫 Gerenciar Escolas</a>
+        <a onclick="navegar('v-fin')">💰 Financeiro</a>
+    </div>
+    <header>
+        <span class="menu-icon" onclick="toggleMenu()">☰</span>
+        <span>VAN PRO</span>
+        <div style="width: 24px;"></div>
+    </header>
+    <div class="container">
+        <div id="v-home" class="view active">
+            <div class="home-hero"><span class="van-logo">🚐</span><h2>Olá!</h2><p style="color: #7f8c8d;">Pronta para a rota?</p></div>
+            <div class="home-grid">
+                <div class="home-btn" onclick="navegar('v-rota')">🚐<br>ROTA DIÁRIA</div>
+                <div class="home-btn" onclick="navegar('v-aluno')">👤<br>NOVO ALUNO</div>
+                <div class="home-btn" onclick="navegar('v-fin')">💰<br>VER SALDO</div>
+                <div class="home-btn" onclick="toggleMenu()">⚙️<br>MENU</div>
+            </div>
+        </div>
+        <div id="v-rota" class="view">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button onclick="mudarTurno('Manhã')" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background: white;">Manhã</button>
+                <button onclick="mudarTurno('Tarde')" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background: white;">Tarde</button>
+            </div>
+            <h3 id="label-turno">Ordem: Manhã</h3>
+            <div id="lista-alunos-rota"></div>
+        </div>
+        <div id="v-aluno" class="view">
+            <div class="card">
+                <h3 id="titulo-cadastro">Novo Aluno</h3>
+                <input type="hidden" id="edit-index" value="-1">
+                <label>Nome do Aluno</label><input type="text" id="cad-nome">
+                <label>Responsável</label><input type="text" id="cad-resp">
+                <label>WhatsApp</label><input type="tel" id="cad-tel" placeholder="83900000000">
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex:1"><label>Valor R$</label><input type="number" id="cad-valor"></div>
+                    <div style="flex:1"><label>Vencimento</label><input type="number" id="cad-dia"></div>
+                </div>
+                <label>Turno</label><select id="cad-turno"><option value="Manhã">Manhã</option><option value="Tarde">Tarde</option></select>
+                <label>Escola</label><select id="cad-esc"></select>
+                <label>Endereço</label><input type="text" id="cad-end">
+                <button class="btn-main" id="btn-salvar-aluno" onclick="salvarAluno()">CADASTRAR</button>
+                <button class="btn-modal" id="btn-cancelar-edit" style="display:none; background:#ccc; margin-top:10px;" onclick="limparForm(); navegar('v-home');">CANCELAR</button>
+            </div>
+        </div>
+        <div id="v-escola" class="view">
+            <div class="card"><h3>Cadastrar Escola</h3><input type="text" id="esc-nome" placeholder="Nome"><button class="btn-main" onclick="salvarEscola()">SALVAR</button></div>
+            <div id="lista-escolas-cad"></div>
+        </div>
+        <div id="v-fin" class="view">
+            <div class="card" style="background:var(--success); color:white; text-align:center"><small>Recebido no Mês</small><br><b id="display-saldo" style="font-size:28px">R$ 0,00</b></div>
+        </div>
+    </div>
+    <div id="meuModal" class="modal">
+        <div class="modal-content">
+            <span class="fechar-modal" onclick="fecharModal()">×</span>
+            <h3 id="mod-nome">Nome</h3>
+            <hr style="opacity: 0.2;">
+            <div id="mod-dados"></div>
+            <a id="btn-rota-gps" href="#" target="_blank" class="btn-modal" style="background: var(--blue); color:white;">📍 OBTER ROTA</a>
+            <a id="btn-zap" href="#" target="_blank" class="btn-modal" style="background: var(--whatsapp); color:white;">💬 WHATSAPP</a>
+            <button class="btn-modal" style="background:#95a5a6; color:white;" onclick="prepararEdicao()">✏️ ALTERAR DADOS</button>
+            <button id="mod-btn-pago" class="btn-modal" onclick="alternarPagamento()" style="color:white;"></button>
+            <button onclick="deletarAluno()" style="background:none; border:none; color:red; margin-top:20px; width:100%; opacity:0.5; font-size:12px;">Excluir Aluno</button>
+        </div>
+    </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => console.log('SW ok'), err => console.log('SW erro', err));
+            });
+        }
+        var DB_ALUNOS = JSON.parse(localStorage.getItem('VAN_PRO_FINAL')) || [];
+        var DB_ESCOLAS = JSON.parse(localStorage.getItem('VAN_ESC_FINAL')) || [];
+        var TURNO_FILTRO = 'Manhã';
+        var INDEX_ABERTO = null;
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.querySelector('.overlay').classList.toggle('active'); }
+        function navegar(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); if(id === 'v-rota') renderRota(); if(id === 'v-escola') renderEscolas(); if(id === 'v-fin') renderFinanceiro(); }
+        function salvarEscola() { var n = document.getElementById('esc-nome').value; if(!n) return; DB_ESCOLAS.push({nome: n}); localStorage.setItem('VAN_ESC_FINAL', JSON.stringify(DB_ESCOLAS)); document.getElementById('esc-nome').value = ''; renderEscolas(); }
+        function renderEscolas() { var sel = document.getElementById('cad-esc'); sel.innerHTML = '<option value="">Escolha...</option>'; var lista = document.getElementById('lista-escolas-cad'); lista.innerHTML = ''; DB_ESCOLAS.forEach(e => { sel.innerHTML += `<option value="${e.nome}">${e.nome}</option>`; lista.innerHTML += `<div class="card"><b>${e.nome}</b></div>`; }); }
+        function salvarAluno() { var idx = parseInt(document.getElementById('edit-index').value); var al = { n: document.getElementById('cad-nome').value, r: document.getElementById('cad-resp').value, t: document.getElementById('cad-tel').value.replace(/\D/g,''), v: parseFloat(document.getElementById('cad-valor').value) || 0, d: document.getElementById('cad-dia').value, u: document.getElementById('cad-turno').value, s: document.getElementById('cad-esc').value, e: document.getElementById('cad-end').value, pago: (idx >= 0) ? DB_ALUNOS[idx].pago : false }; if(!al.n || !al.t) return alert('Obrigatório Nome e Telefone!'); if(idx >= 0) { DB_ALUNOS[idx] = al; } else { DB_ALUNOS.push(al); } localStorage.setItem('VAN_PRO_FINAL', JSON.stringify(DB_ALUNOS)); limparForm(); navegar('v-rota'); }
+        function renderRota() { var lista = document.getElementById('lista-alunos-rota'); lista.innerHTML = ''; DB_ALUNOS.forEach((al, idx) => { if(al.u === TURNO_FILTRO) { var cor = al.pago ? 'var(--success)' : 'var(--danger)'; lista.innerHTML += `<div class="item-aluno" style="border-left-color:${cor}"><div class="info" onclick="abrirModal(${idx})"><b>${al.n}</b><br><small>${al.s}</small></div><div class="controles"><button class="btn-seta" onclick="mover(${idx}, -1); event.stopPropagation();">▲</button><button class="btn-seta" onclick="mover(${idx}, 1); event.stopPropagation();">▼</button></div></div>`; } }); }
+        function abrirModal(idx) { INDEX_ABERTO = idx; var al = DB_ALUNOS[idx]; document.getElementById('mod-nome').innerText = al.n; document.getElementById('mod-dados').innerHTML = `<p><b>Resp:</b> ${al.r}<br><b>Vence:</b> Dia ${al.d}<br><b>Valor:</b> R$ ${al.v.toFixed(2)}<br><b>End:</b> ${al.e}</p>`; document.getElementById('btn-rota-gps').href = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(al.e + ", João Pessoa, PB"); document.getElementById('btn-zap').href = "https://wa.me/55" + al.t; var btn = document.getElementById('mod-btn-pago'); btn.innerText = al.pago ? "RECEBIDO ✔" : "MARCAR COMO RECEBIDO"; btn.style.backgroundColor = al.pago ? 'var(--success)' : 'var(--danger)'; document.getElementById('meuModal').style.display = 'flex'; }
+        function alternarPagamento() { DB_ALUNOS[INDEX_ABERTO].pago = !DB_ALUNOS[INDEX_ABERTO].pago; localStorage.setItem('VAN_PRO_FINAL', JSON.stringify(DB_ALUNOS)); renderRota(); fecharModal(); }
+        function prepararEdicao() { var al = DB_ALUNOS[INDEX_ABERTO]; document.getElementById('edit-index').value = INDEX_ABERTO; document.getElementById('titulo-cadastro').innerText = "Editar Aluno"; document.getElementById('btn-salvar-aluno').innerText = "SALVAR"; document.getElementById('btn-cancelar-edit').style.display = "block"; document.getElementById('cad-nome').value = al.n; document.getElementById('cad-resp').value = al.r; document.getElementById('cad-tel').value = al.t; document.getElementById('cad-valor').value = al.v; document.getElementById('cad-dia').value = al.d; document.getElementById('cad-turno').value = al.u; document.getElementById('cad-esc').value = al.s; document.getElementById('cad-end').value = al.e; fecharModal(); navegar('v-aluno'); }
+        function limparForm() { document.getElementById('edit-index').value = "-1"; document.getElementById('titulo-cadastro').innerText = "Novo Aluno"; document.getElementById('btn-salvar-aluno').innerText = "CADASTRAR"; document.getElementById('btn-cancelar-edit').style.display = "none"; ['cad-nome','cad-resp','cad-tel','cad-valor','cad-dia','cad-end'].forEach(id => document.getElementById(id).value = ''); }
+        function mover(idx, dir) { var novoIdx = idx + dir; if(novoIdx >= 0 && novoIdx < DB_ALUNOS.length) { var temp = DB_ALUNOS[idx]; DB_ALUNOS[idx] = DB_ALUNOS[novoIdx]; DB_ALUNOS[novoIdx] = temp; localStorage.setItem('VAN_PRO_FINAL', JSON.stringify(DB_ALUNOS)); renderRota(); } }
+        function mudarTurno(t) { TURNO_FILTRO = t; document.getElementById('label-turno').innerText = 'Ordem: ' + t; renderRota(); }
+        function renderFinanceiro() { var ent = 0; DB_ALUNOS.forEach(al => { if(al.pago) ent += al.v; }); document.getElementById('display-saldo').innerText = 'R$ ' + ent.toFixed(2); }
+        function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
+        function deletarAluno() { if(confirm("Excluir?")) { DB_ALUNOS.splice(INDEX_ABERTO, 1); localStorage.setItem('VAN_PRO_FINAL', JSON.stringify(DB_ALUNOS)); fecharModal(); renderRota(); } }
+        window.onload = () => { renderEscolas(); renderRota(); };
+    </script>
+</body>
+</html>
