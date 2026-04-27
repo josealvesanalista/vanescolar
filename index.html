@@ -130,7 +130,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // CONFIGURAÇÃO DO FIREBASE COM AS SUAS CHAVES
         const firebaseConfig = {
             apiKey: "AIzaSyDOmwescijjj2l0w0CDfEukTkBZl-x3bf8",
             authDomain: "vanescolar-4e5aa.firebaseapp.com",
@@ -207,4 +206,94 @@
             INDEX_ABERTO = idx;
             const al = DB_ALUNOS[idx];
             document.getElementById('mod-nome').innerText = al.n;
-            document.getElementById('mod-dados').innerHTML = `Resp: ${al.r}<br>Vence: Dia ${al.d}<br>Valor: R$ ${al.v
+            document.getElementById('mod-dados').innerHTML = `<b>Resp:</b> ${al.r}<br><b>Vence:</b> Dia ${al.d}<br><b>Valor:</b> R$ ${al.v.toFixed(2)}<br><b>End:</b> ${al.e}`;
+            
+            // Link do Maps otimizado para João Pessoa
+            document.getElementById('btn-rota-gps').href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(al.e + ", João Pessoa, PB");
+            document.getElementById('btn-zap').href = "https://wa.me/55" + al.t;
+            
+            const btn = document.getElementById('mod-btn-pago');
+            btn.innerText = al.pago ? "RECEBIDO ✔" : "MARCAR RECEBIDO";
+            btn.style.backgroundColor = al.pago ? 'var(--success)' : 'var(--danger)';
+            document.getElementById('meuModal').style.display = 'flex';
+        }
+
+        function alternarPagamento() {
+            const novoStatus = !DB_ALUNOS[INDEX_ABERTO].pago;
+            db.ref('alunos/' + DB_KEYS[INDEX_ABERTO]).update({pago: novoStatus});
+            fecharModal();
+        }
+
+        function prepararEdicao() {
+            const al = DB_ALUNOS[INDEX_ABERTO];
+            document.getElementById('edit-index').value = INDEX_ABERTO;
+            document.getElementById('cad-nome').value = al.n;
+            document.getElementById('cad-resp').value = al.r;
+            document.getElementById('cad-tel').value = al.t;
+            document.getElementById('cad-valor').value = al.v;
+            document.getElementById('cad-dia').value = al.d;
+            document.getElementById('cad-turno').value = al.u;
+            document.getElementById('cad-esc').value = al.s;
+            document.getElementById('cad-end').value = al.e;
+            fecharModal();
+            navegar('v-aluno');
+        }
+
+        function deletarAluno() { 
+            if(confirm("Deseja apagar este aluno permanentemente?")) { 
+                db.ref('alunos/' + DB_KEYS[INDEX_ABERTO]).remove(); 
+                fecharModal(); 
+            } 
+        }
+
+        function salvarEscola() { 
+            const n = document.getElementById('esc-nome').value; 
+            if(n) db.ref('escolas').push({nome: n}); 
+            document.getElementById('esc-nome').value = ''; 
+        }
+        
+        function renderEscolas() { 
+            const sel = document.getElementById('cad-esc'); 
+            sel.innerHTML = '<option value="">Escolha...</option>';
+            const lista = document.getElementById('lista-escolas-cad'); 
+            lista.innerHTML = '';
+            DB_ESCOLAS.forEach(e => {
+                sel.innerHTML += `<option value="${e.nome}">${e.nome}</option>`;
+                lista.innerHTML += `<div class="card"><b>${e.nome}</b></div>`;
+            });
+        }
+
+        function navegar(id) { 
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); 
+            document.getElementById(id).classList.add('active'); 
+            if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); 
+        }
+
+        function toggleMenu() { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.querySelector('.overlay').classList.toggle('active'); 
+        }
+
+        function mudarTurno(t) { 
+            TURNO_FILTRO = t; 
+            document.getElementById('label-turno').innerText = 'Ordem: ' + t; 
+            renderRota(); 
+        }
+
+        function renderFinanceiro() { 
+            let ent = 0; 
+            DB_ALUNOS.forEach(al => { if(al.pago) ent += al.v; }); 
+            document.getElementById('display-saldo').innerText = 'R$ ' + ent.toFixed(2); 
+        }
+
+        function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
+        
+        function limparForm() { 
+            document.getElementById('edit-index').value = "-1"; 
+            ['cad-nome','cad-resp','cad-tel','cad-valor','cad-dia','cad-end'].forEach(id => document.getElementById(id).value = ''); 
+        }
+        
+        window.onload = carregarDados;
+    </script>
+</body>
+</html>
