@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" href="manifest.json">
-    <title>TIA DAY - VAN PRO</title>
+    <title>TIA DAY - VAN PRO v1.6.0</title>
     <style>
         :root { --primary: #f39c12; --secondary: #2c3e50; --bg: #f4f7f6; --success: #27ae60; --danger: #e74c3c; --blue: #3498db; --whatsapp: #25d366; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: #333; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
@@ -32,13 +32,17 @@
         .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
         .item-aluno { display: flex; align-items: center; background: white; padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-left: 8px solid #ccc; }
-        .info { flex: 1; cursor: pointer; padding: 5px 0; }
+        .info { flex: 1; cursor: pointer; }
         .controles-ordem { display: flex; flex-direction: column; gap: 5px; margin-left: 10px; }
-        .btn-seta { background: #eee; border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
+        .btn-seta { background: #eee; border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; font-size: 12px; }
+
+        .fin-resumo { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .fin-card { padding: 10px; border-radius: 10px; text-align: center; color: white; font-size: 12px; }
+        .fin-card b { font-size: 14px; display: block; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
-        .btn-modal { display: block; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-align: center; text-decoration: none; border: none; font-size: 14px; box-sizing: border-box; cursor: pointer; }
+        .btn-modal { display: block; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-align: center; text-decoration: none; border: none; box-sizing: border-box; }
 
         footer { background: #fff; text-align: center; padding: 15px; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; margin-top: 20px; }
     </style>
@@ -67,6 +71,7 @@
             <div style="text-align: center; padding: 20px;">
                 <h1 style="margin:0; font-size: 50px;">🚐</h1>
                 <h2 style="color: var(--secondary)">Olá, Tia Day!</h2>
+                <p id="data-atual-home" style="font-weight: bold; color: var(--primary)"></p>
             </div>
             <div class="home-grid">
                 <div class="home-btn" onclick="navegar('v-rota')">🚐<br>ROTA</div>
@@ -78,10 +83,10 @@
 
         <div id="v-rota" class="view">
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button onclick="mudarTurno('Manhã')" id="btn-m" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:var(--primary); color:white;">Manhã</button>
-                <button onclick="mudarTurno('Tarde')" id="btn-t" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:white;">Tarde</button>
+                <button onclick="mudarTurno('Manhã')" id="btn-m" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">Manhã</button>
+                <button onclick="mudarTurno('Tarde')" id="btn-t" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">Tarde</button>
             </div>
-            <h3 id="label-turno" style="color:var(--secondary)">Ordem: Manhã</h3>
+            <h3 id="label-turno">Ordem: Manhã</h3>
             <div id="lista-alunos-rota"></div>
         </div>
 
@@ -99,7 +104,7 @@
                 <label>Turno</label><select id="cad-turno"><option value="Manhã">Manhã</option><option value="Tarde">Tarde</option></select>
                 <label>Escola</label><select id="cad-esc"></select>
                 <label>Endereço</label><input type="text" id="cad-end">
-                <button class="btn-main" onclick="salvarAluno()">SALVAR NO BANCO</button>
+                <button class="btn-main" onclick="salvarAluno()">SALVAR ALUNO</button>
             </div>
         </div>
 
@@ -112,27 +117,44 @@
         </div>
 
         <div id="v-fin" class="view">
-            <div class="card" style="background:var(--success); color:white; text-align:center; padding: 40px 20px;">
-                <small>Recebido no Mês</small><br><b id="display-saldo" style="font-size:32px">R$ 0,00</b>
+            <h3 id="mes-referencia" style="text-align: center; color: var(--secondary); text-transform: uppercase;"></h3>
+            
+            <div class="fin-resumo">
+                <div class="fin-card" style="background: var(--success)">Entradas<br><b id="f-ent">R$ 0,00</b></div>
+                <div class="fin-card" style="background: var(--danger)">Saídas<br><b id="f-sai">R$ 0,00</b></div>
+                <div class="fin-card" style="background: var(--blue)">Saldo<br><b id="f-sal">R$ 0,00</b></div>
             </div>
+
+            <div class="card">
+                <label>Registrar Gasto (Saída)</label>
+                <input type="text" id="out-desc" placeholder="Ex: Combustível">
+                <input type="number" id="out-val" placeholder="Valor R$">
+                <button class="btn-main" style="background: var(--danger); padding: 10px;" onclick="salvarSaida()">REGISTRAR SAÍDA</button>
+            </div>
+
+            <h4>Extrato do Mês</h4>
+            <div id="lista-fin-mes"></div>
+
+            <h4 style="margin-top: 30px;">Histórico de Meses Anteriores</h4>
+            <div id="historico-meses"></div>
         </div>
     </div>
 
     <footer>
         Desenvolvido por <b>Juba Sistemas</b><br>
-        Todos os direitos reservados &copy; 2026
+        Todos os direitos reservados © 2026
     </footer>
 
     <div id="meuModal" class="modal">
         <div class="modal-content">
             <h3 id="mod-nome"></h3>
-            <div id="mod-dados" style="font-size:14px; margin-bottom:15px; line-height:1.6"></div>
-            <a id="btn-rota-gps" href="#" target="_blank" class="btn-modal" style="background:var(--blue); color:white;">📍 ABRIR NO MAPS</a>
-            <a id="btn-zap" href="#" target="_blank" class="btn-modal" style="background:var(--whatsapp); color:white;">💬 CHAMAR NO WHATSAPP</a>
-            <button class="btn-modal" style="background:#95a5a6; color:white;" onclick="prepararEdicao()">✏️ EDITAR DADOS</button>
+            <div id="mod-dados" style="font-size:14px; margin-bottom:15px"></div>
+            <a id="btn-rota-gps" href="#" target="_blank" class="btn-modal" style="background:var(--blue); color:white;">📍 MAPS</a>
+            <a id="btn-zap" href="#" target="_blank" class="btn-modal" style="background:var(--whatsapp); color:white;">💬 WHATSAPP</a>
+            <button class="btn-modal" style="background:#95a5a6; color:white;" onclick="prepararEdicao()">✏️ EDITAR</button>
             <button id="mod-btn-pago" class="btn-modal" onclick="alternarPagamento()" style="color:white;"></button>
-            <button onclick="deletarAluno()" style="background:none; border:none; color:red; width:100%; margin-top:20px; font-weight:bold; cursor:pointer">EXCLUIR ALUNO</button>
-            <button onclick="fecharModal()" style="width:100%; border:none; margin-top:15px; padding:10px; cursor:pointer">Fechar</button>
+            <button onclick="deletarAluno()" style="background:none; border:none; color:red; width:100%; margin-top:20px; font-weight:bold;">EXCLUIR</button>
+            <button onclick="fecharModal()" style="width:100%; border:none; margin-top:10px; cursor:pointer">Fechar</button>
         </div>
     </div>
 
@@ -154,32 +176,142 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let DB_ALUNOS = []; // Guardará os objetos {key, data}
+        let DB_ALUNOS = [];
         let DB_ESCOLAS = [];
+        let DB_SAIDAS = [];
         let TURNO_FILTRO = 'Manhã';
         let INDEX_ABERTO = null;
 
+        // Lógica de Datas
+        const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const dataHj = new Date();
+        const mesRef = (dataHj.getMonth() + 1).toString().padStart(2, '0') + "-" + dataHj.getFullYear();
+        const mesExtenso = nomesMeses[dataHj.getMonth()] + " " + dataHj.getFullYear();
+
         function carregarDados() {
+            document.getElementById('mes-referencia').innerText = mesExtenso;
+            document.getElementById('data-atual-home').innerText = mesExtenso;
+
             db.ref('alunos').on('value', snap => {
                 const data = snap.val();
                 DB_ALUNOS = [];
                 if (data) {
-                    // Transforma em array de objetos com a key do Firebase e ordena pelo campo 'ordem'
-                    Object.keys(data).forEach(key => {
-                        DB_ALUNOS.push({ key: key, ...data[key] });
-                    });
+                    Object.keys(data).forEach(key => DB_ALUNOS.push({ key, ...data[key] }));
                     DB_ALUNOS.sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
                 }
                 renderRota();
                 renderFinanceiro();
             });
+
             db.ref('escolas').on('value', snap => {
                 const data = snap.val();
-                DB_ESCOLAS = data ? Object.values(data) : [];
+                DB_ESCOLAS = [];
+                if (data) {
+                    Object.keys(data).forEach(key => DB_ESCOLAS.push({ key, ...data[key] }));
+                    // ORDEM ALFABÉTICA
+                    DB_ESCOLAS.sort((a, b) => a.nome.localeCompare(b.nome));
+                }
                 renderEscolas();
+            });
+
+            db.ref('saidas/' + mesRef).on('value', snap => {
+                const data = snap.val();
+                DB_SAIDAS = data ? Object.values(data) : [];
+                renderFinanceiro();
+            });
+
+            carregarHistorico();
+        }
+
+        // --- ESCOLAS ORDENADAS ---
+        function salvarEscola() {
+            const n = document.getElementById('esc-nome').value.trim();
+            if(n) db.ref('escolas').push({nome: n});
+            document.getElementById('esc-nome').value = '';
+        }
+
+        function renderEscolas() {
+            const sel = document.getElementById('cad-esc');
+            sel.innerHTML = '<option value="">Escolha...</option>';
+            const lista = document.getElementById('lista-escolas-cad');
+            lista.innerHTML = '';
+            DB_ESCOLAS.forEach(e => {
+                sel.innerHTML += `<option value="${e.nome}">${e.nome}</option>`;
+                lista.innerHTML += `<div class="card" style="padding:10px; margin-bottom:5px"><b>${e.nome}</b></div>`;
             });
         }
 
+        // --- FINANCEIRO DETALHADO ---
+        function salvarSaida() {
+            const desc = document.getElementById('out-desc').value;
+            const valor = parseFloat(document.getElementById('out-val').value);
+            if(desc && valor) {
+                db.ref('saidas/' + mesRef).push({ desc, valor, data: new Date().toLocaleDateString() });
+                document.getElementById('out-desc').value = '';
+                document.getElementById('out-val').value = '';
+            }
+        }
+
+        function renderFinanceiro() {
+            let totalEntrada = 0;
+            const listaFin = document.getElementById('lista-fin-mes');
+            listaFin.innerHTML = '';
+
+            // Entradas (Alunos que já pagaram)
+            DB_ALUNOS.forEach(al => {
+                if(al.pago) {
+                    totalEntrada += al.v;
+                    listaFin.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px; color:var(--success)">
+                        <span>➕ ${al.n}</span><b>R$ ${al.v.toFixed(2)}</b>
+                    </div>`;
+                }
+            });
+
+            // Saídas
+            let totalSaida = 0;
+            DB_SAIDAS.forEach(s => {
+                totalSaida += s.valor;
+                listaFin.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px; color:var(--danger)">
+                    <span>➖ ${s.desc}</span><b>R$ ${s.valor.toFixed(2)}</b>
+                </div>`;
+            });
+
+            const saldo = totalEntrada - totalSaida;
+            document.getElementById('f-ent').innerText = 'R$ ' + totalEntrada.toFixed(2);
+            document.getElementById('f-sai').innerText = 'R$ ' + totalSaida.toFixed(2);
+            document.getElementById('f-sal').innerText = 'R$ ' + saldo.toFixed(2);
+
+            // Salva o resumo do mês para o histórico
+            db.ref('historico/' + mesRef).set({
+                mesNome: mesExtenso,
+                entradas: totalEntrada,
+                saidas: totalSaida,
+                saldo: saldo
+            });
+        }
+
+        function carregarHistorico() {
+            db.ref('historico').on('value', snap => {
+                const data = snap.val();
+                const divHist = document.getElementById('historico-meses');
+                divHist.innerHTML = '';
+                if(data) {
+                    Object.keys(data).reverse().forEach(key => {
+                        if(key !== mesRef) { // Não mostra o mês atual no histórico
+                            const h = data[key];
+                            divHist.innerHTML += `<div class="card" style="padding:10px; font-size:12px">
+                                <b>${h.mesNome}</b><br>
+                                <span style="color:var(--success)">Entradas: R$ ${h.entradas.toFixed(2)}</span> | 
+                                <span style="color:var(--danger)">Saídas: R$ ${h.saidas.toFixed(2)}</span><br>
+                                <b>Saldo Final: R$ ${h.saldo.toFixed(2)}</b>
+                            </div>`;
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- FUNÇÕES DE ROTA E ALUNO (MANTIDAS DA v1.5.0) ---
         function salvarAluno() {
             const idx_edit = document.getElementById('edit-index').value;
             const al = {
@@ -195,27 +327,18 @@
                 ordem: (idx_edit !== "-1") ? DB_ALUNOS[idx_edit].ordem : DB_ALUNOS.length
             };
             if(!al.n) return alert("Nome é obrigatório!");
-            
-            if(idx_edit !== "-1") {
-                db.ref('alunos/' + DB_ALUNOS[idx_edit].key).set(al);
-            } else {
-                db.ref('alunos').push(al);
-            }
-            limparForm();
-            navegar('v-rota');
+            if(idx_edit !== "-1") db.ref('alunos/' + DB_ALUNOS[idx_edit].key).set(al);
+            else db.ref('alunos').push(al);
+            limparForm(); navegar('v-rota');
         }
 
         function renderRota() {
             const lista = document.getElementById('lista-alunos-rota');
             lista.innerHTML = '';
-            
-            // Filtra apenas os alunos do turno selecionado
             const alunosTurno = DB_ALUNOS.filter(a => a.u === TURNO_FILTRO);
-
-            alunosTurno.forEach((al, idx) => {
+            alunosTurno.forEach((al) => {
                 const globalIdx = DB_ALUNOS.indexOf(al);
                 const cor = al.pago ? 'var(--success)' : 'var(--danger)';
-                
                 lista.innerHTML += `
                     <div class="item-aluno" style="border-left-color:${cor}">
                         <div class="info" onclick="abrirModal(${globalIdx})">
@@ -232,33 +355,9 @@
         function mover(index, direcao) {
             const outroIndex = index + direcao;
             if (outroIndex < 0 || outroIndex >= DB_ALUNOS.length) return;
-
-            // Só permite mover se o próximo também for do mesmo turno (para não bagunçar a lógica visual)
-            if (DB_ALUNOS[index].u !== DB_ALUNOS[outroIndex].u) {
-                // Procura o próximo do mesmo turno
-                let busca = outroIndex;
-                while (busca >= 0 && busca < DB_ALUNOS.length && DB_ALUNOS[busca].u !== DB_ALUNOS[index].u) {
-                    busca += direcao;
-                }
-                if (busca < 0 || busca >= DB_ALUNOS.length) return;
-                trocarOrdem(index, busca);
-            } else {
-                trocarOrdem(index, outroIndex);
-            }
-        }
-
-        function trocarOrdem(idx1, idx2) {
-            const ordem1 = DB_ALUNOS[idx1].ordem || 0;
-            const ordem2 = DB_ALUNOS[idx2].ordem || 0;
-            
-            // Se as ordens forem iguais (alunos novos), força a diferença
-            const novaOrdem1 = idx2;
-            const novaOrdem2 = idx1;
-
             const updates = {};
-            updates['/alunos/' + DB_ALUNOS[idx1].key + '/ordem'] = idx2;
-            updates['/alunos/' + DB_ALUNOS[idx2].key + '/ordem'] = idx1;
-            
+            updates['/alunos/' + DB_ALUNOS[index].key + '/ordem'] = outroIndex;
+            updates['/alunos/' + DB_ALUNOS[outroIndex].key + '/ordem'] = index;
             db.ref().update(updates);
         }
 
@@ -266,11 +365,11 @@
             INDEX_ABERTO = idx;
             const al = DB_ALUNOS[idx];
             document.getElementById('mod-nome').innerText = al.n;
-            document.getElementById('mod-dados').innerHTML = `<b>Responsável:</b> ${al.r}<br><b>Vencimento:</b> Dia ${al.d}<br><b>Mensalidade:</b> R$ ${al.v.toFixed(2)}<br><b>Endereço:</b> ${al.e}`;
+            document.getElementById('mod-dados').innerHTML = `Resp: ${al.r}<br>Vence: Dia ${al.d}<br>Valor: R$ ${al.v.toFixed(2)}<br>End: ${al.e}`;
             document.getElementById('btn-rota-gps').href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(al.e + ", João Pessoa, PB");
             document.getElementById('btn-zap').href = "https://wa.me/55" + al.t;
             const btn = document.getElementById('mod-btn-pago');
-            btn.innerText = al.pago ? "ESTÁ PAGO ✔" : "MARCAR COMO PAGO";
+            btn.innerText = al.pago ? "PAGO ✔" : "MARCAR PAGO";
             btn.style.backgroundColor = al.pago ? 'var(--success)' : 'var(--danger)';
             document.getElementById('meuModal').style.display = 'flex';
         }
@@ -281,6 +380,12 @@
             fecharModal();
         }
 
+        function deletarAluno() { if(confirm("Excluir?")) { db.ref('alunos/' + DB_ALUNOS[INDEX_ABERTO].key).remove(); fecharModal(); } }
+        function navegar(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); }
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.querySelector('.overlay').classList.toggle('active'); }
+        function mudarTurno(t) { TURNO_FILTRO = t; document.getElementById('label-turno').innerText = 'Ordem: ' + t; renderRota(); }
+        function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
+        function limparForm() { document.getElementById('edit-index').value = "-1"; ['cad-nome','cad-resp','cad-tel','cad-valor','cad-dia','cad-end'].forEach(id => document.getElementById(id).value = ''); }
         function prepararEdicao() {
             const al = DB_ALUNOS[INDEX_ABERTO];
             document.getElementById('edit-index').value = INDEX_ABERTO;
@@ -292,53 +397,9 @@
             document.getElementById('cad-turno').value = al.u;
             document.getElementById('cad-esc').value = al.s;
             document.getElementById('cad-end').value = al.e;
-            fecharModal();
-            navegar('v-aluno');
+            fecharModal(); navegar('v-aluno');
         }
 
-        function deletarAluno() { 
-            if(confirm("Excluir permanentemente?")) { 
-                db.ref('alunos/' + DB_ALUNOS[INDEX_ABERTO].key).remove(); 
-                fecharModal(); 
-            } 
-        }
-
-        function salvarEscola() { 
-            const n = document.getElementById('esc-nome').value; 
-            if(n) db.ref('escolas').push({nome: n}); 
-            document.getElementById('esc-nome').value = ''; 
-        }
-        
-        function renderEscolas() { 
-            const sel = document.getElementById('cad-esc'); sel.innerHTML = '<option value="">Escolha...</option>';
-            const lista = document.getElementById('lista-escolas-cad'); lista.innerHTML = '';
-            DB_ESCOLAS.forEach(e => {
-                sel.innerHTML += `<option value="${e.nome}">${e.nome}</option>`;
-                lista.innerHTML += `<div class="card"><b>${e.nome}</b></div>`;
-            });
-        }
-
-        function mudarTurno(t) { 
-            TURNO_FILTRO = t; 
-            document.getElementById('label-turno').innerText = 'Ordem: ' + t;
-            document.getElementById('btn-m').style.background = t === 'Manhã' ? 'var(--primary)' : 'white';
-            document.getElementById('btn-m').style.color = t === 'Manhã' ? 'white' : '#333';
-            document.getElementById('btn-t').style.background = t === 'Tarde' ? 'var(--primary)' : 'white';
-            document.getElementById('btn-t').style.color = t === 'Tarde' ? 'white' : '#333';
-            renderRota(); 
-        }
-
-        function navegar(id) { 
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); 
-            document.getElementById(id).classList.add('active'); 
-            if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); 
-        }
-
-        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.querySelector('.overlay').classList.toggle('active'); }
-        function renderFinanceiro() { let ent = 0; DB_ALUNOS.forEach(al => { if(al.pago) ent += al.v; }); document.getElementById('display-saldo').innerText = 'R$ ' + ent.toFixed(2); }
-        function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
-        function limparForm() { document.getElementById('edit-index').value = "-1"; ['cad-nome','cad-resp','cad-tel','cad-valor','cad-dia','cad-end'].forEach(id => document.getElementById(id).value = ''); }
-        
         window.onload = carregarDados;
     </script>
 </body>
