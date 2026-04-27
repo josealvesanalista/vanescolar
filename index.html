@@ -8,7 +8,7 @@
     <title>TIA DAY - VAN PRO</title>
     <style>
         :root { --primary: #f39c12; --secondary: #2c3e50; --bg: #f4f7f6; --success: #27ae60; --danger: #e74c3c; --blue: #3498db; --whatsapp: #25d366; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: #333; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: #333; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
         
         header { background: var(--secondary); color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .menu-icon { font-size: 24px; cursor: pointer; padding: 5px; }
@@ -18,13 +18,12 @@
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1500; }
         .overlay.active { display: block; }
 
-        .container { padding: 20px; max-width: 600px; margin: auto; }
+        .container { padding: 20px; max-width: 600px; margin: auto; flex: 1; width: 100%; box-sizing: border-box; }
         .view { display: none; animation: fadeIn 0.3s; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .home-hero { text-align: center; padding: 30px 20px; }
-        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .home-btn { background: white; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #ddd; font-weight: bold; color: var(--secondary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
 
         .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; }
@@ -32,12 +31,16 @@
         input, select { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        .item-aluno { display: flex; align-items: center; background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-left: 8px solid #ccc; }
-        .info { flex: 1; cursor: pointer; }
+        .item-aluno { display: flex; align-items: center; background: white; padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-left: 8px solid #ccc; }
+        .info { flex: 1; cursor: pointer; padding: 5px 0; }
+        .controles-ordem { display: flex; flex-direction: column; gap: 5px; margin-left: 10px; }
+        .btn-seta { background: #eee; border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
         .btn-modal { display: block; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-align: center; text-decoration: none; border: none; font-size: 14px; box-sizing: border-box; cursor: pointer; }
+
+        footer { background: #fff; text-align: center; padding: 15px; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -49,6 +52,8 @@
         <a onclick="navegar('v-aluno')">👤 Cadastrar Aluno</a>
         <a onclick="navegar('v-escola')">🏫 Escolas</a>
         <a onclick="navegar('v-fin')">💰 Financeiro</a>
+        <hr style="border: 0; border-top: 1px solid #34495e; margin: 10px 0;">
+        <a href="https://wa.me/5583998027542" target="_blank" style="color: var(--whatsapp);">🛠️ Suporte Técnico</a>
     </div>
 
     <header>
@@ -59,9 +64,9 @@
 
     <div class="container">
         <div id="v-home" class="view active">
-            <div class="home-hero">
-                <h1 style="margin:0; color:var(--primary)">🚐</h1>
-                <h2>Olá, Tia Day!</h2>
+            <div style="text-align: center; padding: 20px;">
+                <h1 style="margin:0; font-size: 50px;">🚐</h1>
+                <h2 style="color: var(--secondary)">Olá, Tia Day!</h2>
             </div>
             <div class="home-grid">
                 <div class="home-btn" onclick="navegar('v-rota')">🚐<br>ROTA</div>
@@ -73,10 +78,10 @@
 
         <div id="v-rota" class="view">
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button onclick="mudarTurno('Manhã')" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:white;">Manhã</button>
-                <button onclick="mudarTurno('Tarde')" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:white;">Tarde</button>
+                <button onclick="mudarTurno('Manhã')" id="btn-m" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:var(--primary); color:white;">Manhã</button>
+                <button onclick="mudarTurno('Tarde')" id="btn-t" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:white;">Tarde</button>
             </div>
-            <h3 id="label-turno">Ordem: Manhã</h3>
+            <h3 id="label-turno" style="color:var(--secondary)">Ordem: Manhã</h3>
             <div id="lista-alunos-rota"></div>
         </div>
 
@@ -107,22 +112,27 @@
         </div>
 
         <div id="v-fin" class="view">
-            <div class="card" style="background:var(--success); color:white; text-align:center">
-                <small>Recebido no Mês</small><br><b id="display-saldo" style="font-size:28px">R$ 0,00</b>
+            <div class="card" style="background:var(--success); color:white; text-align:center; padding: 40px 20px;">
+                <small>Recebido no Mês</small><br><b id="display-saldo" style="font-size:32px">R$ 0,00</b>
             </div>
         </div>
     </div>
 
+    <footer>
+        Desenvolvido por <b>Juba Sistemas</b><br>
+        Todos os direitos reservados &copy; 2026
+    </footer>
+
     <div id="meuModal" class="modal">
         <div class="modal-content">
             <h3 id="mod-nome"></h3>
-            <div id="mod-dados" style="font-size:14px; margin-bottom:15px"></div>
-            <a id="btn-rota-gps" href="#" target="_blank" class="btn-modal" style="background:var(--blue); color:white;">📍 ROTA NO MAPS</a>
-            <a id="btn-zap" href="#" target="_blank" class="btn-modal" style="background:var(--whatsapp); color:white;">💬 WHATSAPP</a>
-            <button class="btn-modal" style="background:#95a5a6; color:white;" onclick="prepararEdicao()">✏️ ALTERAR</button>
+            <div id="mod-dados" style="font-size:14px; margin-bottom:15px; line-height:1.6"></div>
+            <a id="btn-rota-gps" href="#" target="_blank" class="btn-modal" style="background:var(--blue); color:white;">📍 ABRIR NO MAPS</a>
+            <a id="btn-zap" href="#" target="_blank" class="btn-modal" style="background:var(--whatsapp); color:white;">💬 CHAMAR NO WHATSAPP</a>
+            <button class="btn-modal" style="background:#95a5a6; color:white;" onclick="prepararEdicao()">✏️ EDITAR DADOS</button>
             <button id="mod-btn-pago" class="btn-modal" onclick="alternarPagamento()" style="color:white;"></button>
-            <button onclick="deletarAluno()" style="background:none; border:none; color:red; width:100%; margin-top:15px">Excluir Aluno</button>
-            <button onclick="fecharModal()" style="width:100%; border:none; margin-top:10px; cursor:pointer">Fechar</button>
+            <button onclick="deletarAluno()" style="background:none; border:none; color:red; width:100%; margin-top:20px; font-weight:bold; cursor:pointer">EXCLUIR ALUNO</button>
+            <button onclick="fecharModal()" style="width:100%; border:none; margin-top:15px; padding:10px; cursor:pointer">Fechar</button>
         </div>
     </div>
 
@@ -144,8 +154,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let DB_ALUNOS = [];
-        let DB_KEYS = [];
+        let DB_ALUNOS = []; // Guardará os objetos {key, data}
         let DB_ESCOLAS = [];
         let TURNO_FILTRO = 'Manhã';
         let INDEX_ABERTO = null;
@@ -153,8 +162,14 @@
         function carregarDados() {
             db.ref('alunos').on('value', snap => {
                 const data = snap.val();
-                DB_ALUNOS = data ? Object.values(data) : [];
-                DB_KEYS = data ? Object.keys(data) : [];
+                DB_ALUNOS = [];
+                if (data) {
+                    // Transforma em array de objetos com a key do Firebase e ordena pelo campo 'ordem'
+                    Object.keys(data).forEach(key => {
+                        DB_ALUNOS.push({ key: key, ...data[key] });
+                    });
+                    DB_ALUNOS.sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+                }
                 renderRota();
                 renderFinanceiro();
             });
@@ -166,7 +181,7 @@
         }
 
         function salvarAluno() {
-            const idx = document.getElementById('edit-index').value;
+            const idx_edit = document.getElementById('edit-index').value;
             const al = {
                 n: document.getElementById('cad-nome').value,
                 r: document.getElementById('cad-resp').value,
@@ -176,12 +191,13 @@
                 u: document.getElementById('cad-turno').value,
                 s: document.getElementById('cad-esc').value,
                 e: document.getElementById('cad-end').value,
-                pago: (idx !== "-1") ? DB_ALUNOS[idx].pago : false
+                pago: (idx_edit !== "-1") ? DB_ALUNOS[idx_edit].pago : false,
+                ordem: (idx_edit !== "-1") ? DB_ALUNOS[idx_edit].ordem : DB_ALUNOS.length
             };
             if(!al.n) return alert("Nome é obrigatório!");
             
-            if(idx !== "-1") {
-                db.ref('alunos/' + DB_KEYS[idx]).set(al);
+            if(idx_edit !== "-1") {
+                db.ref('alunos/' + DB_ALUNOS[idx_edit].key).set(al);
             } else {
                 db.ref('alunos').push(al);
             }
@@ -192,35 +208,76 @@
         function renderRota() {
             const lista = document.getElementById('lista-alunos-rota');
             lista.innerHTML = '';
-            DB_ALUNOS.forEach((al, idx) => {
-                if(al.u === TURNO_FILTRO) {
-                    const cor = al.pago ? 'var(--success)' : 'var(--danger)';
-                    lista.innerHTML += `<div class="item-aluno" style="border-left-color:${cor}" onclick="abrirModal(${idx})">
-                        <div class="info"><b>${al.n}</b><br><small>${al.s}</small></div>
+            
+            // Filtra apenas os alunos do turno selecionado
+            const alunosTurno = DB_ALUNOS.filter(a => a.u === TURNO_FILTRO);
+
+            alunosTurno.forEach((al, idx) => {
+                const globalIdx = DB_ALUNOS.indexOf(al);
+                const cor = al.pago ? 'var(--success)' : 'var(--danger)';
+                
+                lista.innerHTML += `
+                    <div class="item-aluno" style="border-left-color:${cor}">
+                        <div class="info" onclick="abrirModal(${globalIdx})">
+                            <b>${al.n}</b><br><small>${al.s}</small>
+                        </div>
+                        <div class="controles-ordem">
+                            <button class="btn-seta" onclick="mover(${globalIdx}, -1)">▲</button>
+                            <button class="btn-seta" onclick="mover(${globalIdx}, 1)">▼</button>
+                        </div>
                     </div>`;
-                }
             });
+        }
+
+        function mover(index, direcao) {
+            const outroIndex = index + direcao;
+            if (outroIndex < 0 || outroIndex >= DB_ALUNOS.length) return;
+
+            // Só permite mover se o próximo também for do mesmo turno (para não bagunçar a lógica visual)
+            if (DB_ALUNOS[index].u !== DB_ALUNOS[outroIndex].u) {
+                // Procura o próximo do mesmo turno
+                let busca = outroIndex;
+                while (busca >= 0 && busca < DB_ALUNOS.length && DB_ALUNOS[busca].u !== DB_ALUNOS[index].u) {
+                    busca += direcao;
+                }
+                if (busca < 0 || busca >= DB_ALUNOS.length) return;
+                trocarOrdem(index, busca);
+            } else {
+                trocarOrdem(index, outroIndex);
+            }
+        }
+
+        function trocarOrdem(idx1, idx2) {
+            const ordem1 = DB_ALUNOS[idx1].ordem || 0;
+            const ordem2 = DB_ALUNOS[idx2].ordem || 0;
+            
+            // Se as ordens forem iguais (alunos novos), força a diferença
+            const novaOrdem1 = idx2;
+            const novaOrdem2 = idx1;
+
+            const updates = {};
+            updates['/alunos/' + DB_ALUNOS[idx1].key + '/ordem'] = idx2;
+            updates['/alunos/' + DB_ALUNOS[idx2].key + '/ordem'] = idx1;
+            
+            db.ref().update(updates);
         }
 
         function abrirModal(idx) {
             INDEX_ABERTO = idx;
             const al = DB_ALUNOS[idx];
             document.getElementById('mod-nome').innerText = al.n;
-            document.getElementById('mod-dados').innerHTML = `<b>Resp:</b> ${al.r}<br><b>Vence:</b> Dia ${al.d}<br><b>Valor:</b> R$ ${al.v.toFixed(2)}<br><b>End:</b> ${al.e}`;
-            
-            // Link do Maps otimizado para João Pessoa
+            document.getElementById('mod-dados').innerHTML = `<b>Responsável:</b> ${al.r}<br><b>Vencimento:</b> Dia ${al.d}<br><b>Mensalidade:</b> R$ ${al.v.toFixed(2)}<br><b>Endereço:</b> ${al.e}`;
             document.getElementById('btn-rota-gps').href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(al.e + ", João Pessoa, PB");
             document.getElementById('btn-zap').href = "https://wa.me/55" + al.t;
-            
             const btn = document.getElementById('mod-btn-pago');
-            btn.innerText = al.pago ? "RECEBIDO ✔" : "MARCAR RECEBIDO";
+            btn.innerText = al.pago ? "ESTÁ PAGO ✔" : "MARCAR COMO PAGO";
             btn.style.backgroundColor = al.pago ? 'var(--success)' : 'var(--danger)';
             document.getElementById('meuModal').style.display = 'flex';
         }
 
         function alternarPagamento() {
             const novoStatus = !DB_ALUNOS[INDEX_ABERTO].pago;
-            db.ref('alunos/' + DB_KEYS[INDEX_ABERTO]).update({pago: novoStatus});
+            db.ref('alunos/' + DB_ALUNOS[INDEX_ABERTO].key).update({pago: novoStatus});
             fecharModal();
         }
 
@@ -240,8 +297,8 @@
         }
 
         function deletarAluno() { 
-            if(confirm("Deseja apagar este aluno permanentemente?")) { 
-                db.ref('alunos/' + DB_KEYS[INDEX_ABERTO]).remove(); 
+            if(confirm("Excluir permanentemente?")) { 
+                db.ref('alunos/' + DB_ALUNOS[INDEX_ABERTO].key).remove(); 
                 fecharModal(); 
             } 
         }
@@ -253,14 +310,22 @@
         }
         
         function renderEscolas() { 
-            const sel = document.getElementById('cad-esc'); 
-            sel.innerHTML = '<option value="">Escolha...</option>';
-            const lista = document.getElementById('lista-escolas-cad'); 
-            lista.innerHTML = '';
+            const sel = document.getElementById('cad-esc'); sel.innerHTML = '<option value="">Escolha...</option>';
+            const lista = document.getElementById('lista-escolas-cad'); lista.innerHTML = '';
             DB_ESCOLAS.forEach(e => {
                 sel.innerHTML += `<option value="${e.nome}">${e.nome}</option>`;
                 lista.innerHTML += `<div class="card"><b>${e.nome}</b></div>`;
             });
+        }
+
+        function mudarTurno(t) { 
+            TURNO_FILTRO = t; 
+            document.getElementById('label-turno').innerText = 'Ordem: ' + t;
+            document.getElementById('btn-m').style.background = t === 'Manhã' ? 'var(--primary)' : 'white';
+            document.getElementById('btn-m').style.color = t === 'Manhã' ? 'white' : '#333';
+            document.getElementById('btn-t').style.background = t === 'Tarde' ? 'var(--primary)' : 'white';
+            document.getElementById('btn-t').style.color = t === 'Tarde' ? 'white' : '#333';
+            renderRota(); 
         }
 
         function navegar(id) { 
@@ -269,29 +334,10 @@
             if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); 
         }
 
-        function toggleMenu() { 
-            document.getElementById('sidebar').classList.toggle('active'); 
-            document.querySelector('.overlay').classList.toggle('active'); 
-        }
-
-        function mudarTurno(t) { 
-            TURNO_FILTRO = t; 
-            document.getElementById('label-turno').innerText = 'Ordem: ' + t; 
-            renderRota(); 
-        }
-
-        function renderFinanceiro() { 
-            let ent = 0; 
-            DB_ALUNOS.forEach(al => { if(al.pago) ent += al.v; }); 
-            document.getElementById('display-saldo').innerText = 'R$ ' + ent.toFixed(2); 
-        }
-
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.querySelector('.overlay').classList.toggle('active'); }
+        function renderFinanceiro() { let ent = 0; DB_ALUNOS.forEach(al => { if(al.pago) ent += al.v; }); document.getElementById('display-saldo').innerText = 'R$ ' + ent.toFixed(2); }
         function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
-        
-        function limparForm() { 
-            document.getElementById('edit-index').value = "-1"; 
-            ['cad-nome','cad-resp','cad-tel','cad-valor','cad-dia','cad-end'].forEach(id => document.getElementById(id).value = ''); 
-        }
+        function limparForm() { document.getElementById('edit-index').value = "-1"; ['cad-nome','cad-resp','cad-tel','cad-valor','cad-dia','cad-end'].forEach(id => document.getElementById(id).value = ''); }
         
         window.onload = carregarDados;
     </script>
