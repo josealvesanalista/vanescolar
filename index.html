@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" href="manifest.json">
-    <title>TIA DAY - VAN PRO v1.7.0</title>
+    <title>TIA DAY - VAN PRO v1.7.1</title>
     <style>
         :root { --primary: #f39c12; --secondary: #2c3e50; --bg: #f4f7f6; --success: #27ae60; --danger: #e74c3c; --warning: #f1c40f; --blue: #3498db; --whatsapp: #25d366; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: #333; display: flex; flex-direction: column; min-height: 100vh; }
@@ -28,7 +28,6 @@
         input, select { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        /* LISTA DE ALUNOS COM CORES DINÂMICAS */
         .item-aluno { display: flex; align-items: center; background: white; padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-left: 10px solid #ccc; }
         .info { flex: 1; cursor: pointer; }
         .controles-ordem { display: flex; flex-direction: column; gap: 5px; margin-left: 10px; }
@@ -81,12 +80,12 @@
 
         <div id="v-rota" class="view">
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button onclick="mudarTurno('Manhã')" id="btn-m" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:var(--primary); color:white;">Manhã</button>
-                <button onclick="mudarTurno('Tarde')" id="btn-t" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:white;">Tarde</button>
+                <button onclick="mudarTurno('Manhã')" id="btn-m" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; cursor:pointer;">Manhã</button>
+                <button onclick="mudarTurno('Tarde')" id="btn-t" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; cursor:pointer;">Tarde</button>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 id="label-turno">Ordem: Manhã</h3>
-                <small style="font-size: 10px; color: #7f8c8d;">🟢 Pago | 🟡 2 dias | 🔴 Cobrar</small>
+                <small style="font-size: 10px; color: #7f8c8d;">🟢 Pago | 🟡 Próximo | 🔴 Cobrar</small>
             </div>
             <div id="lista-alunos-rota"></div>
         </div>
@@ -133,10 +132,7 @@
         </div>
     </div>
 
-    <footer>
-        Desenvolvido por <b>Juba Sistemas</b><br>
-        Todos os direitos reservados © 2026
-    </footer>
+    <footer>Desenvolvido por <b>Juba Sistemas</b><br>Todos os direitos reservados © 2026</footer>
 
     <div id="meuModal" class="modal">
         <div class="modal-content">
@@ -182,18 +178,15 @@
             document.getElementById('data-atual-home').innerText = mesExtenso;
             
             db.ref('alunos').on('value', snap => {
-                const data = snap.val();
-                DB_ALUNOS = [];
+                const data = snap.val(); DB_ALUNOS = [];
                 if (data) {
                     Object.keys(data).forEach(key => DB_ALUNOS.push({ key, ...data[key] }));
                     DB_ALUNOS.sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
                 }
-                renderRota();
-                renderFinanceiro();
+                renderRota(); renderFinanceiro();
             });
             db.ref('escolas').on('value', snap => {
-                const data = snap.val();
-                DB_ESCOLAS = data ? Object.keys(data).map(k => data[k]).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
+                DB_ESCOLAS = snap.val() ? Object.keys(snap.val()).map(k => snap.val()[k]).sort((a,b) => a.nome.localeCompare(b.nome)) : [];
                 renderEscolas();
             });
             db.ref('saidas/' + mesRef).on('value', snap => {
@@ -202,24 +195,35 @@
             });
         }
 
+        function mudarTurno(t) {
+            TURNO_FILTRO = t;
+            renderRota(); // Redesenha a lista filtrada e atualiza os botões
+        }
+
         function renderRota() {
+            const btnM = document.getElementById('btn-m');
+            const btnT = document.getElementById('btn-t');
+            const lblT = document.getElementById('label-turno');
+            
+            // Atualiza visual dos botões
+            btnM.style.background = TURNO_FILTRO === 'Manhã' ? 'var(--primary)' : 'white';
+            btnM.style.color = TURNO_FILTRO === 'Manhã' ? 'white' : '#333';
+            btnT.style.background = TURNO_FILTRO === 'Tarde' ? 'var(--primary)' : 'white';
+            btnT.style.color = TURNO_FILTRO === 'Tarde' ? 'white' : '#333';
+            lblT.innerText = 'Ordem: ' + TURNO_FILTRO;
+
             const lista = document.getElementById('lista-alunos-rota');
             lista.innerHTML = '';
             const alunosTurno = DB_ALUNOS.filter(a => a.u === TURNO_FILTRO);
 
             alunosTurno.forEach((al) => {
                 const globalIdx = DB_ALUNOS.indexOf(al);
-                let corStatus = 'var(--danger)'; // Padrão: Vermelho
-                
+                let corStatus = 'var(--danger)';
                 const vencimento = parseInt(al.d);
-                // Verifica se o pagamento registrado é do mês/ano atual
                 const pagoEsteMes = al.pago && al.mesPago === mesRef;
 
-                if (pagoEsteMes) {
-                    corStatus = 'var(--success)'; // Verde
-                } else if (vencimento - diaAtual <= 2 && vencimento - diaAtual >= 0) {
-                    corStatus = 'var(--warning)'; // Amarelo (Faltam 2 dias ou hoje)
-                }
+                if (pagoEsteMes) corStatus = 'var(--success)';
+                else if (vencimento - diaAtual <= 2 && vencimento - diaAtual >= 0) corStatus = 'var(--warning)';
 
                 lista.innerHTML += `
                     <div class="item-aluno" style="border-left-color:${corStatus}">
@@ -234,28 +238,20 @@
             });
         }
 
+        // --- FUNÇÕES DE APOIO (MANTIDAS) ---
         function alternarPagamento() {
             const al = DB_ALUNOS[INDEX_ABERTO];
-            // Se já estava pago este mês, desmarca. Se não, marca com o mês atual.
             const jaPago = al.pago && al.mesPago === mesRef;
-            
-            db.ref('alunos/' + al.key).update({
-                pago: !jaPago,
-                mesPago: !jaPago ? mesRef : ""
-            });
+            db.ref('alunos/' + al.key).update({ pago: !jaPago, mesPago: !jaPago ? mesRef : "" });
             fecharModal();
         }
 
-        // Funções de apoio
         function salvarAluno() {
             const idx_edit = document.getElementById('edit-index').value;
             const al = {
-                n: document.getElementById('cad-nome').value,
-                d: document.getElementById('cad-dia').value,
-                v: parseFloat(document.getElementById('cad-valor').value) || 0,
-                u: document.getElementById('cad-turno').value,
-                s: document.getElementById('cad-esc').value,
-                t: document.getElementById('cad-tel').value.replace(/\D/g,''),
+                n: document.getElementById('cad-nome').value, d: document.getElementById('cad-dia').value,
+                v: parseFloat(document.getElementById('cad-valor').value) || 0, u: document.getElementById('cad-turno').value,
+                s: document.getElementById('cad-esc').value, t: document.getElementById('cad-tel').value.replace(/\D/g,''),
                 e: document.getElementById('cad-end').value,
                 pago: (idx_edit !== "-1") ? DB_ALUNOS[idx_edit].pago : false,
                 mesPago: (idx_edit !== "-1") ? (DB_ALUNOS[idx_edit].mesPago || "") : "",
@@ -294,7 +290,6 @@
         function renderFinanceiro() { let ent = 0, sai = 0; document.getElementById('lista-fin-mes').innerHTML = ''; DB_ALUNOS.forEach(al => { if(al.pago && al.mesPago === mesRef) { ent += al.v; document.getElementById('lista-fin-mes').innerHTML += `<div style="color:green; font-size:12px">🟢 ${al.n}: R$ ${al.v.toFixed(2)}</div>`; } }); DB_SAIDAS.forEach(s => { sai += s.valor; document.getElementById('lista-fin-mes').innerHTML += `<div style="color:red; font-size:12px">🔴 ${s.desc}: R$ ${s.valor.toFixed(2)}</div>`; }); document.getElementById('f-ent').innerText = 'R$ '+ent.toFixed(2); document.getElementById('f-sai').innerText = 'R$ '+sai.toFixed(2); document.getElementById('f-sal').innerText = 'R$ '+(ent-sai).toFixed(2); }
         function navegar(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); }
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.querySelector('.overlay').classList.toggle('active'); }
-        function mudarTurno(t) { TURNO_FILTRO = t; renderRota(); }
         function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
         function limparForm() { document.getElementById('edit-index').value = "-1"; ['cad-nome','cad-dia','cad-valor','cad-tel','cad-end'].forEach(i => document.getElementById(i).value = ''); }
         function deletarAluno() { if(confirm("Remover aluno?")) { db.ref('alunos/' + DB_ALUNOS[INDEX_ABERTO].key).remove(); fecharModal(); } }
