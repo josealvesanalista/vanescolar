@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" href="manifest.json">
-    <title>TIA DAY - VAN PRO v1.7.2</title>
+    <title>TIA DAY - VAN PRO v1.7.3</title>
     <style>
         :root { --primary: #f39c12; --secondary: #2c3e50; --bg: #f4f7f6; --success: #27ae60; --danger: #e74c3c; --warning: #f1c40f; --blue: #3498db; --whatsapp: #25d366; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        
         header { background: var(--secondary); color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .menu-icon { font-size: 24px; cursor: pointer; padding: 5px; }
         .sidebar { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: var(--secondary); color: white; transition: 0.3s; z-index: 2000; padding-top: 60px; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
@@ -16,21 +17,30 @@
         .sidebar a { display: block; padding: 15px 25px; color: #ecf0f1; text-decoration: none; border-bottom: 1px solid #34495e; font-size: 16px; cursor: pointer; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1500; }
         .overlay.active { display: block; }
+
         .container { padding: 20px; max-width: 600px; margin: auto; flex: 1; width: 100%; box-sizing: border-box; }
         .view { display: none; animation: fadeIn 0.3s; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; }
         label { font-size: 11px; font-weight: bold; color: #7f8c8d; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; margin: 5px 0 15px 0; border: 1px solid #dcdde1; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .btn-main { background: var(--primary); color: white; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+
         .item-aluno { display: flex; align-items: center; background: white; padding: 10px 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-left: 10px solid #ccc; }
         .info { flex: 1; cursor: pointer; }
         .controles-ordem { display: flex; flex-direction: column; gap: 5px; margin-left: 10px; }
         .btn-seta { background: #eee; border: 1px solid #ccc; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
+
+        .fin-resumo { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .fin-card { padding: 10px; border-radius: 10px; text-align: center; color: white; font-size: 12px; }
+        .fin-card b { font-size: 14px; display: block; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
         .btn-modal { display: block; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-align: center; text-decoration: none; border: none; box-sizing: border-box; cursor: pointer; }
+
         footer { background: #fff; text-align: center; padding: 15px; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; margin-top: 20px; }
     </style>
 </head>
@@ -85,7 +95,7 @@
                 <h3 id="titulo-cadastro">Novo Aluno</h3>
                 <input type="hidden" id="edit-index" value="-1">
                 <label>Nome do Aluno</label><input type="text" id="cad-nome">
-                <label>Responsável</label><input type="text" id="cad-resp" placeholder="Nome do pai/mãe">
+                <label>Responsável</label><input type="text" id="cad-resp">
                 <label>Vencimento (Dia)</label><input type="number" id="cad-dia" placeholder="Ex: 10">
                 <label>Valor R$</label><input type="number" id="cad-valor">
                 <label>Turno</label><select id="cad-turno"><option value="Manhã">Manhã</option><option value="Tarde">Tarde</option></select>
@@ -106,18 +116,20 @@
 
         <div id="v-fin" class="view">
             <h3 id="mes-referencia" style="text-align: center; color: var(--secondary);"></h3>
-            <div id="financeiro-resumo" class="fin-resumo">
+            <div class="fin-resumo">
                 <div class="fin-card" style="background: var(--success)">Entradas<br><b id="f-ent">R$ 0,00</b></div>
                 <div class="fin-card" style="background: var(--danger)">Saídas<br><b id="f-sai">R$ 0,00</b></div>
                 <div class="fin-card" style="background: var(--blue)">Saldo<br><b id="f-sal">R$ 0,00</b></div>
             </div>
             <div class="card">
                 <label>Registrar Saída</label>
-                <input type="text" id="out-desc" placeholder="Ex: Combustível">
+                <input type="text" id="out-desc" placeholder="Ex: Gasolina">
                 <input type="number" id="out-val" placeholder="Valor R$">
                 <button class="btn-main" style="background: var(--danger)" onclick="salvarSaida()">SALVAR GASTO</button>
             </div>
             <div id="lista-fin-mes"></div>
+            <hr>
+            <div id="historico-meses"></div>
         </div>
     </div>
 
@@ -156,11 +168,16 @@
         let DB_ALUNOS = [], DB_ESCOLAS = [], DB_SAIDAS = [];
         let TURNO_FILTRO = 'Manhã', INDEX_ABERTO = null;
         
+        const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const dataHj = new Date();
         const diaAtual = dataHj.getDate();
         const mesRef = (dataHj.getMonth() + 1).toString().padStart(2, '0') + "-" + dataHj.getFullYear();
+        const mesExtenso = nomesMeses[dataHj.getMonth()] + " " + dataHj.getFullYear();
 
         function carregarDados() {
+            document.getElementById('mes-referencia').innerText = mesExtenso;
+            document.getElementById('data-atual-home').innerText = mesExtenso;
+            
             db.ref('alunos').on('value', snap => {
                 const data = snap.val(); DB_ALUNOS = [];
                 if (data) {
@@ -239,7 +256,7 @@
             const idx_edit = document.getElementById('edit-index').value;
             const al = {
                 n: document.getElementById('cad-nome').value,
-                r: document.getElementById('cad-resp').value, // Responsável adicionado aqui
+                r: document.getElementById('cad-resp').value,
                 d: document.getElementById('cad-dia').value,
                 v: parseFloat(document.getElementById('cad-valor').value) || 0,
                 u: document.getElementById('cad-turno').value,
@@ -255,32 +272,36 @@
             limparForm(); navegar('v-rota');
         }
 
-        function prepararEdicao() {
-            const al = DB_ALUNOS[INDEX_ABERTO];
-            document.getElementById('edit-index').value = INDEX_ABERTO;
-            document.getElementById('cad-nome').value = al.n;
-            document.getElementById('cad-resp').value = al.r || '';
-            document.getElementById('cad-dia').value = al.d;
-            document.getElementById('cad-valor').value = al.v;
-            document.getElementById('cad-turno').value = al.u;
-            document.getElementById('cad-esc').value = al.s;
-            document.getElementById('cad-tel').value = al.t;
-            document.getElementById('cad-end').value = al.e;
-            fecharModal(); navegar('v-aluno');
+        function renderFinanceiro() {
+            let ent = 0, sai = 0;
+            document.getElementById('lista-fin-mes').innerHTML = '';
+            DB_ALUNOS.forEach(al => {
+                if(al.pago && al.mesPago === mesRef) {
+                    ent += al.v;
+                    document.getElementById('lista-fin-mes').innerHTML += `<div style="color:green; font-size:12px; margin-bottom:5px">🟢 ${al.n}: R$ ${al.v.toFixed(2)}</div>`;
+                }
+            });
+            DB_SAIDAS.forEach(s => {
+                sai += s.valor;
+                document.getElementById('lista-fin-mes').innerHTML += `<div style="color:red; font-size:12px; margin-bottom:5px">🔴 ${s.desc}: R$ ${s.valor.toFixed(2)}</div>`;
+            });
+            document.getElementById('f-ent').innerText = 'R$ '+ent.toFixed(2);
+            document.getElementById('f-sai').innerText = 'R$ '+sai.toFixed(2);
+            document.getElementById('f-sal').innerText = 'R$ '+(ent-sai).toFixed(2);
         }
 
-        // Funções padrão mantidas
+        // --- Funções de Navegação e Auxiliares ---
+        function navegar(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); }
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.querySelector('.overlay').classList.toggle('active'); }
+        function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
+        function limparForm() { document.getElementById('edit-index').value = "-1"; ['cad-nome','cad-resp','cad-dia','cad-valor','cad-tel','cad-end'].forEach(i => document.getElementById(i).value = ''); }
         function alternarPagamento() { const al = DB_ALUNOS[INDEX_ABERTO]; const jaPago = al.pago && al.mesPago === mesRef; db.ref('alunos/' + al.key).update({ pago: !jaPago, mesPago: !jaPago ? mesRef : "" }); fecharModal(); }
         function mover(index, direcao) { const outroIndex = index + direcao; if (outroIndex < 0 || outroIndex >= DB_ALUNOS.length) return; const updates = {}; updates['/alunos/' + DB_ALUNOS[index].key + '/ordem'] = outroIndex; updates['/alunos/' + DB_ALUNOS[outroIndex].key + '/ordem'] = index; db.ref().update(updates); }
         function salvarEscola() { const n = document.getElementById('esc-nome').value; if(n) db.ref('escolas').push({nome: n}); document.getElementById('esc-nome').value = ''; }
         function renderEscolas() { const sel = document.getElementById('cad-esc'); sel.innerHTML = '<option value="">Selecione...</option>'; document.getElementById('lista-escolas-cad').innerHTML = ''; DB_ESCOLAS.forEach(e => { sel.innerHTML += `<option value="${e.nome}">${e.nome}</option>`; document.getElementById('lista-escolas-cad').innerHTML += `<div class="card" style="padding:10px; margin-bottom:5px">${e.nome}</div>`; }); }
         function salvarSaida() { const d = document.getElementById('out-desc').value, v = parseFloat(document.getElementById('out-val').value); if(d && v) db.ref('saidas/' + mesRef).push({desc: d, valor: v}); document.getElementById('out-desc').value = ''; document.getElementById('out-val').value = ''; }
-        function renderFinanceiro() { let ent = 0, sai = 0; document.getElementById('lista-fin-mes').innerHTML = ''; DB_ALUNOS.forEach(al => { if(al.pago && al.mesPago === mesRef) { ent += al.v; document.getElementById('lista-fin-mes').innerHTML += `<div style="color:green; font-size:12px">🟢 ${al.n}: R$ ${al.v.toFixed(2)}</div>`; } }); DB_SAIDAS.forEach(s => { sai += s.valor; document.getElementById('lista-fin-mes').innerHTML += `<div style="color:red; font-size:12px">🔴 ${s.desc}: R$ ${s.valor.toFixed(2)}</div>`; }); document.getElementById('f-ent').innerText = 'R$ '+ent.toFixed(2); document.getElementById('f-sai').innerText = 'R$ '+sai.toFixed(2); document.getElementById('f-sal').innerText = 'R$ '+(ent-sai).toFixed(2); }
-        function navegar(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); if(document.getElementById('sidebar').classList.contains('active')) toggleMenu(); }
-        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.querySelector('.overlay').classList.toggle('active'); }
-        function fecharModal() { document.getElementById('meuModal').style.display = 'none'; }
-        function limparForm() { document.getElementById('edit-index').value = "-1"; ['cad-nome','cad-resp','cad-dia','cad-valor','cad-tel','cad-end'].forEach(i => document.getElementById(i).value = ''); }
         function deletarAluno() { if(confirm("Remover aluno?")) { db.ref('alunos/' + DB_ALUNOS[INDEX_ABERTO].key).remove(); fecharModal(); } }
+        function prepararEdicao() { const al = DB_ALUNOS[INDEX_ABERTO]; document.getElementById('edit-index').value = INDEX_ABERTO; document.getElementById('cad-nome').value = al.n; document.getElementById('cad-resp').value = al.r || ''; document.getElementById('cad-dia').value = al.d; document.getElementById('cad-valor').value = al.v; document.getElementById('cad-turno').value = al.u; document.getElementById('cad-esc').value = al.s; document.getElementById('cad-tel').value = al.t; document.getElementById('cad-end').value = al.e; fecharModal(); navegar('v-aluno'); }
 
         window.onload = carregarDados;
     </script>
